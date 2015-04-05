@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="ISUX">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="width=device-width,user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <title>demo</title>
+    <link rel="stylesheet" type="text/css" href="lib/frozenui/1.2.1/css/global.css">
+</head>
+<body>
+  <section class="ui-selector">
+  <header class="ui-border-b">
+    <h3>陈市明的TODO清单</h3>
+  </header>
+        <div class="content"><p><div class="ui-tab">
+    <ul class="ui-tab-content" style="width: 300%;">
+        <li>
+            <ul class="ui-list ui-list-text ui-border-b" id="tab1_ul" >
+                <!-- <li class="ui-border-t">
+                    <h4 class="ui-nowrap">[2014-03-03] 4月份IT部门济州岛出行</h4>
+                    <button class="ui-btn ui-btn-progress">
+                        <span>1/11</span>
+                        <span class="ui-btn-inner" style="width:50%"><span>1/11</span></span>
+                    </button>            
+                </li> -->
+            </ul>
+        </li>
+        <li>
+            <ul class="ui-list ui-list-text ui-border-b">
+                <li class="ui-border-t">
+                    <div class="ui-list-info">
+                        <h4 class="ui-nowrap">这是标题，加ui-nowrap可以超出长度截断</h4>
+                    </div>
+                    <div class="ui-badge">123</div>
+                </li>
+                <li class="ui-border-t">
+                    <div class="ui-list-info">
+                        <h4 class="ui-nowrap">这是标题，加ui-nowrap可以超出长度截断</h4>
+                    </div>
+                    <div class="ui-badge-muted">123</div>
+                </li>
+                <li class="ui-border-t">
+                    <div class="ui-list-info">
+                       <h4>标题标题标题标题标题标题标</h4>
+                    </div>
+                    <div class="ui-list-action">使用中</div>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <ul class="ui-list ui-list-link ui-border-b">
+                <li class="ui-border-t">
+                    <div class="ui-list-img">
+                        <span style="background-image:url(http://placehold.sinaapp.com/?200*136)"></span>
+                    </div>
+                    <div class="ui-list-info">
+                        <h4 class="ui-nowrap">这是标题，加ui-nowrap可以超出长度截断</h4>
+                        <p class="ui-nowrap">这是内容，加ui-nowrap可以超出长度截断</p>
+                    </div>
+                </li>
+                <li class="ui-border-t">
+                    <div class="ui-list-img">
+                       <span style="background-image:url(http://placehold.sinaapp.com/?200*136)"></span>
+                    </div>
+                    <div class="ui-list-info">
+                        <h4 class="ui-nowrap">这是标题，加ui-nowrap可以超出长度截断</h4>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <ul class="ui-tab-nav ui-border-b">
+        <li class="current">当前处理</li>
+        <li>已过期</li>
+        <li>已删除</li>
+    </ul>
+</div></p></div>
+
+</section>
+</body>
+
+<script id="tpl_tab1_li" type="text/x-handlebars-template">
+	 {{#each datas}}
+                <li class="ui-border-t">
+                    <h4 class="ui-nowrap">[{{occure_date}}] {{title}}</h4>
+                    <button class="ui-btn ui-btn-progress">
+                        <span>{{finish_count}}/{{all_count}}</span>
+                        <span class="ui-btn-inner" style="width:50%"><span>{{finish_count}}/{{all_count}}</span></span>
+                    </button>            
+                </li>
+	{{/each}}
+</script>
+
+
+    <script src="lib/zepto/zepto.min.js?_bid=304"></script>
+    <script src="lib/frozenjs/1.0.1/frozen.js?_bid=304"></script>
+    <script src="lib/handlebars/2.0.0/handlebars.js?_bid=304"></script>
+<script>
+var tab = new fz.Scroll('.ui-tab', {
+    role: 'tab',
+    interval: 3000
+});
+tab.on('beforeScrollStart', function(fromIndex, toIndex) {
+    switch(toIndex){
+    case 0:
+    	tab1();
+    	break;
+    case 1:
+    	break;
+    case 2:
+    	break;
+    } 
+});
+
+var T = {
+	//读取模板
+	tpl:function(s){
+		return Handlebars.compile($(s).html());
+	},
+	ajax:function(url,sucFun,errFun){
+        if(errFun==null){
+        	errFun = function(errorMessage){
+                alert("errorMessage="+errorMessage);
+            }
+        }	
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json",
+            error: function(XHR, textStatus, errorThrown) {
+                errFun(textStatus,errorThrown);
+            }, 
+            success: function(json, textStatus) {
+          		console.log(json);
+                if (json == null || json.resultFlag == null || json.resultFlag != '0') {
+                	errFun(json.resultMessage);
+                } else {
+                	sucFun(json);
+                }
+            },
+            headers: {
+                //"ucore1": localStorage.ucore1
+            }       
+        });       
+	},
+};
+var template = T.tpl("#tpl_tab1_li");
+function tab1(){
+	T.ajax("/spr_todo/servlet/todo/query/",
+		function(json){
+			console.log(json);
+			$("#tab1_ul").html(template(json));		
+		}
+	);
+}
+tab1();
+tab.on('scrollEnd', function() {
+    console.log('end')
+});  
+
+
+
+</script>
+
+
+</html>
+ 
