@@ -20,9 +20,9 @@ var T = {
         window.location=url;
 	},
     //ajax 获取当前页面的json数据
-    getPageJson:function(view,func){
+    getPageJson:function(ds,view,func){
         var viewName = view.viewName;
-        var url = "modules/"+viewName;
+        var url = "modules/"+viewName+"/"+ds;
         return this.getJson(url,view,func);
     },
     //ajax ，封装zepto

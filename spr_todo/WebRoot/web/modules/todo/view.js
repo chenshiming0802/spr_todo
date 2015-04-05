@@ -24,7 +24,7 @@ define([
             var that = this;
             T.assertParamsLength(that.params,1);
             var todoId = that.params[0];
-            T.getPageJson(that,that.renderTpl);
+            T.getPageJson("index?todoId="+todoId,that,that.renderTpl);
 
         },
         onJs:function(){

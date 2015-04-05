@@ -1,0 +1,9 @@
+<% _.each( collection, function( model, id ) { %>
+                <li class="ui-border-t tab1Li" sid="<%=model.id%>">
+                    <h4 class="ui-nowrap">[<%= model.occure_date %>] <%= model.title %></h4>
+                    <button class="ui-btn ui-btn-progress">
+                        <span><%= model.finish_count %>/<%= model.all_count %></span>
+                        <span class="ui-btn-inner" style="width:50%"><%= model.finish_count %>/<%= model.all_count %></span>
+                    </button>            
+                </li>
+<% }); %>

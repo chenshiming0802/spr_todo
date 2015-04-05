@@ -24,7 +24,7 @@ define([
         onResume:function(){
             var that = this;
             //T.getJSON("todo/query",that,that.renderTab1Ul);
-            T.getPageJson(that,that.renderTab1Ul);
+            T.getPageJson("index",that,that.renderTab1Ul);
         },
         onJs:function(){
             var that = this;

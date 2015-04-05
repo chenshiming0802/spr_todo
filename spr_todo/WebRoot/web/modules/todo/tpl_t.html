@@ -1,0 +1,10 @@
+ <% _.each( collection, function( model, id ) { %>
+                <li class="ui-border-t">
+                    <label class="ui-checkbox">
+                        <input type="checkbox" <% if (model.finish_time) { %>checked<% } %> class="checkboxObj"/>
+                    </label>
+                    <p>
+                        <%=model.title%>
+                    </p>
+                </li>
+<% }); %>                
