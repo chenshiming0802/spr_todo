@@ -18,9 +18,12 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.orm.jpa.vendor.Database;
 
+import com.ibatis.sqlmap.client.SqlMapClient;
 import com.sprcore.fosun.app.AppAsserts;
 import com.sprcore.fosun.app.AppException;
+import com.sprcore.fosun.utils.depend.SqlMapClientDao;
 
 public class Dao {
 	private Log logger = LogFactory.getLog(getClass()); 
@@ -53,15 +56,37 @@ public class Dao {
 			throw new AppException(e);
 		}
 	}
-
-	public Map queryById(String table ,String id) {
-		String sql = "select t.* from "+table+" t where t.id=?";
-		List param = new ArrayList();
-		param.add(id);
-		return getRow(sql, param);
+	
+	
+	/**
+	 * 查询单表的简化写法
+	 * @param tableName
+	 * @param fields where的字段名
+	 * @param values where的字段对应的值
+	 * @return
+	 */
+	public Map getTableRow(String tableName,String[] fields,Object[] values){
+		StringBuffer sql = new StringBuffer();
+		sql.append("select * from "+tableName+" t where 1=1");
+		for(int i=0,j=fields.length;i<j;i++){
+			sql.append(" and ").append(fields[i]).append("=? ");
+		}
+		return getRow(sql.toString(), values);
+	}
+	/**
+	 * 根据ID查询单表
+	 * @param tableName
+	 * @param id
+	 * @return
+	 */
+	public Map getTableRowById(String tableName,String id){
+		return getTableRow(tableName,new String[]{"id"},new Object[]{id});
+	}
+	private Map getRow(String sql,Object[] param){
+		return getRow(sql, convertToList(param));
 	}
 
-	public Map getRow(String sql,List param) {
+	private Map getRow(String sql,List param) {
 		List<Map> list = queryList(sql, param);
 		if(list!=null && list.size()>0){
 			return list.get(0);
@@ -76,8 +101,11 @@ public class Dao {
 		}
 		return obj;
 	}
-
-	public List<Map> queryList(String sql,List param) {
+	
+	private List<Map> queryList(String sql,Object[] param) {
+		return queryList(sql, convertToList(param));
+	}
+	private List<Map> queryList(String sql,List param) {
 		List<Map> sr = new ArrayList<Map>();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -114,23 +142,7 @@ public class Dao {
 		}
 		return sr;
 	}
-	
-	private PreparedStatement setPreparedStatement(PreparedStatement stmt,List param) throws SQLException{
-		//ע��Sql����
-		for(int i=0,j=param.size();i<j;i++){
-			Object item = param.get(i);
-			if (item instanceof String) {
-				stmt.setString(i+1, (String)item);
-			}else if(item instanceof Integer) {
-				stmt.setInt(i+1, ((Integer)item).intValue());
-			}else if(item instanceof Float) {
-				stmt.setFloat(i+1, ((Float)item).floatValue());
-			}else{
-				throw new AppException("DB��Ӧjava�����ͷǷ� "+item);
-			}
-		}
-		return stmt;
-	}
+
 
 	public String insert(String table_name,Map map) {
 		String uuid = UUID.randomUUID().toString();
@@ -196,7 +208,7 @@ public class Dao {
  
 	}
 
-	public List<Map> queryOffsetList(String sql, int begin, int end) {
+	private List<Map> queryOffsetList(String sql, int begin, int end) {
 		//TODO
 		return null;
 	}
@@ -211,4 +223,37 @@ public class Dao {
 		logger.info(sb.toString());
 	}
 
+	private List convertToList(Object[] param){
+		List plist = new ArrayList();
+		if(param!=null){
+			for(int i=0,j=param.length;i<j;i++){
+				plist.add(param[i]);
+			}
+		}
+		return plist;
+	}
+
+	
+	private PreparedStatement setPreparedStatement(PreparedStatement stmt,List param) throws SQLException{
+		for(int i=0,j=param.size();i<j;i++){
+			Object item = param.get(i);
+			if (item instanceof String) {
+				stmt.setString(i+1, (String)item);
+			}else if(item instanceof Integer) {
+				stmt.setInt(i+1, ((Integer)item).intValue());
+			}else if(item instanceof Float) {
+				stmt.setFloat(i+1, ((Float)item).floatValue());
+			}else{
+				throw new AppException("DB2Java object error"+item);
+			}
+		}
+		return stmt;
+	}
+	
+	public List<Map> iQueryList(String statementName,Map parameterObject){
+		SqlMapClientDao idao = new SqlMapClientDao();
+		idao.setDataSource(this.dataSource);
+		idao.setSqlMapClient((SqlMapClient)Spring.getBean("sqlMapClient"));
+		return idao.getSqlMapClientTemplate().queryForList(statementName, parameterObject);
+	}
 }

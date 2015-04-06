@@ -1,5 +1,6 @@
 package com.sprcore.fosun.utils.depend;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -37,7 +38,16 @@ public class DateJsonValueProcessor  implements JsonValueProcessor{
             {  
                 obj[i] = sf.format(dates[i]);  
             }  
-        }  
+        }else if (value instanceof Timestamp[])  
+        {  
+            SimpleDateFormat sf = new SimpleDateFormat(format);  
+            Timestamp[] dates = (Timestamp[]) value;  
+            obj = new String[dates.length];  
+            for (int i = 0; i < dates.length; i++)  
+            {  
+                obj[i] = sf.format(dates[i]);  
+            }  
+        }
         return obj;  
     }
      
@@ -51,7 +61,11 @@ public class DateJsonValueProcessor  implements JsonValueProcessor{
         {  
             String str = new SimpleDateFormat(format).format((Date) value);  
             return str;  
-        }  
+        }else if (value instanceof Timestamp){
+        	String str = new SimpleDateFormat(format).format((Timestamp) value); 
+        	 return str;  
+        }
+        
         return value;  
     }  
    
