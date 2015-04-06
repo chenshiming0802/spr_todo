@@ -1,13 +1,15 @@
 package com.sprcore.fosun.app;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
- * 为简化系统内部异常处理，所有异常转为BaseException<BR>
- * 业务错误也可以转为AppException
  * @author chensm
  *
  */
 public class AppException extends RuntimeException {
+	private Log logger = LogFactory.getLog(getClass()); 
 	public AppException(String message) {
 		this.message = message;
 	}
@@ -15,6 +17,7 @@ public class AppException extends RuntimeException {
 	public AppException(Exception e) {
 		this.e = e;
 		this.message = e.getMessage();
+		logger.info("e.getMessage()="+e.getMessage());
 		e.printStackTrace();
 	}
 

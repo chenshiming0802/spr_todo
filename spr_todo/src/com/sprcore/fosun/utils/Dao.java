@@ -61,16 +61,23 @@ public class Dao {
 	/**
 	 * 查询单表的简化写法
 	 * @param tableName
-	 * @param fields where的字段名
-	 * @param values where的字段对应的值
+	 * @param whereParam
 	 * @return
 	 */
-	public Map getTableRow(String tableName,String[] fields,Object[] values){
+	public Map getTableRow(String tableName,Map whereParam){
+		Object[] values = new Object[whereParam.size()];
+		int index = 0;
+		
 		StringBuffer sql = new StringBuffer();
 		sql.append("select * from "+tableName+" t where 1=1");
-		for(int i=0,j=fields.length;i<j;i++){
-			sql.append(" and ").append(fields[i]).append("=? ");
+		Iterator<String> it = whereParam.keySet().iterator();
+		while(it.hasNext()){
+			String key = it.next();
+			sql.append(" and ").append(key).append("=?");
+			
+			values[index++] = whereParam.get(key);
 		}
+		
 		return getRow(sql.toString(), values);
 	}
 	/**
@@ -80,7 +87,7 @@ public class Dao {
 	 * @return
 	 */
 	public Map getTableRowById(String tableName,String id){
-		return getTableRow(tableName,new String[]{"id"},new Object[]{id});
+		return getTableRow(tableName,new AppMap().add("id", id));
 	}
 	private Map getRow(String sql,Object[] param){
 		return getRow(sql, convertToList(param));
@@ -100,6 +107,13 @@ public class Dao {
 			return new Date(t.getTime());
 		}
 		return obj;
+	}
+	private Object setDbCell(Object obj){
+		if (obj instanceof Date) {
+			Date t = (Date)obj;
+			return new Timestamp(t.getTime());
+		}
+		return obj;		
 	}
 	
 	private List<Map> queryList(String sql,Object[] param) {
@@ -150,7 +164,7 @@ public class Dao {
 			StringBuffer sb = new StringBuffer();
 			StringBuffer sbValues = new StringBuffer();
 			map.put("id",uuid);
-			sb.append("insert into "+table_name+" t (");
+			sb.append("insert into "+table_name+" (");
 			String sep = "";
 			Connection conn = dataSource.getConnection();
 			Iterator<String> it = map.keySet().iterator();
@@ -161,7 +175,7 @@ public class Dao {
 				sb.append(sep).append(key);
 				sbValues.append(sep).append("?");
 				sep = ",";
-				param.add(val);
+				param.add(setDbCell(val));
 			}
 			sb.append(") values(");
 			sb.append(sbValues).append(")");
@@ -171,6 +185,7 @@ public class Dao {
 			stmt = setPreparedStatement(stmt, param);
 			stmt.executeUpdate();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new AppException(e);
 		}
 		return uuid;
@@ -193,7 +208,7 @@ public class Dao {
 				sb.append(sep).append(key);
 				sb.append("=?");
 				sep = ",";
-				param.add(val);
+				param.add(setDbCell(val));
 			}
 			sb.append(" where id=?");
 			param.add(id);
@@ -243,6 +258,8 @@ public class Dao {
 				stmt.setInt(i+1, ((Integer)item).intValue());
 			}else if(item instanceof Float) {
 				stmt.setFloat(i+1, ((Float)item).floatValue());
+			}else if(item instanceof Timestamp) {
+				stmt.setTimestamp(i+1, (Timestamp)item);
 			}else{
 				throw new AppException("DB2Java object error"+item);
 			}
