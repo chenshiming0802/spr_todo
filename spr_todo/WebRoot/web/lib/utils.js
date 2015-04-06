@@ -19,29 +19,69 @@ var T = {
 		console.log("forword:"+url);
         window.location=url;
 	},
-    //ajax 获取当前页面的json数据
-    getPageJson:function(ds,view,func){
+    //ajax
+    getPageJson:function(ds,view,func,errFunc){
+        var that = this;
         var viewName = view.viewName;
         var url = "modules/"+viewName+"/"+ds;
-        return this.getJson(url,view,func);
+        /*$.getJSON(url, function(data){
+          that._processHttpSr(view,data,func,errFunc);
+        });*/  
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          success: function(data){
+            that._processHttpSr(view,data,func,errFunc);
+          },
+          error: function(xhr, type){
+            that._processHttpSr(view,{resultFlag:"1",resultMessage:"Net Error"},func,errFunc);
+          }
+        });         
     },
-    postPage:function(ds,params,view,func){
+    //ajax
+    postPage:function(ds,params,view,func,errFunc){
+        var that = this;
         var viewName = view.viewName;
-        var url = "modules/"+viewName+"/"+ds;        
-        $.post(url, params, function(data){
-            console.log(data);
-            func(view,data);
-        })        
+        var url = "modules/"+viewName+"/"+ds;
+        console.log("post:"+url);
+        console.log(params); 
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: params,
+          dataType: 'json',
+          success: function(data){
+            that._processHttpSr(view,data,func,errFunc);
+          },
+          error: function(xhr, type){
+            that._processHttpSr(view,{resultFlag:"1",resultMessage:"Net Error"},func,errFunc);
+          }
+        });
+    },
+    //for getPageJson&postPage 处理结果信息
+    _processHttpSr:function(view,data,func,errFunc){
+        console.log(data);
+        if(data && data.resultFlag=="0"){
+            if(func){
+                func(view,data);
+            }
+        }else{
+            alert('Net Error!!!');
+            if(errFunc){
+                errFunc(view,data);
+            }
+        }
     },
     //ajax ，封装zepto
-    getJson:function(url,view,func){
+    /*getJson:function(url,view,func){
         //TODO 错误处理 resultFlag=1
         console.log("getJson from:"+url);
         $.getJSON(url, function(data){
           console.log(data);
           func(view,data);
         });        
-    },
+    },*/
     //搜索tagName对应的父节点
     getParent:function(jqObj,tagName){
         var jqTagName = jqObj.attr("tagName");

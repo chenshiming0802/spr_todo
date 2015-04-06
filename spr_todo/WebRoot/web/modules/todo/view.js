@@ -40,17 +40,15 @@ define([
             var checked = e.target.checked;
             var val = e.target.value;
             if(checked){
-                T.postPage("finish",{todoLineId:val},that,that.n);
-                alert("'selected="+val);
+                T.postPage("finish/index.jsp",{todoLineId:val},that,null,function(){
+                    e.target.checked = false;
+                });
             }else{
-                T.postPage("unfinish",{todoLineId:val},that,that.n);
-                alert('unselected='+val);
+                T.postPage("unfinish/index.jsp",{todoLineId:val},that,null,function(){
+                    e.target.checked = true;
+                });
             } 
-        },
-        n:function(view,data){
-            var that = this,doc = document;
-        }
-        
+        },        
     } );
     return View;
 
