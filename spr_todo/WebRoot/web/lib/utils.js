@@ -85,7 +85,7 @@ var T = {
     //搜索tagName对应的父节点
     getParent:function(jqObj,tagName){
         var jqTagName = jqObj.attr("tagName");
-        console.log(jqObj+"/"+jqTagName);
+        //console.log(jqObj+"/"+jqTagName);
         if(jqTagName=="BODY" || jqTagName==undefined){
             return null;
         }
