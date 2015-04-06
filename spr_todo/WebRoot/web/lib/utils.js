@@ -25,9 +25,18 @@ var T = {
         var url = "modules/"+viewName+"/"+ds;
         return this.getJson(url,view,func);
     },
+    postPage:function(ds,params,view,func){
+        var viewName = view.viewName;
+        var url = "modules/"+viewName+"/"+ds;        
+        $.post(url, params, function(data){
+            console.log(data);
+            func(view,data);
+        })        
+    },
     //ajax ，封装zepto
     getJson:function(url,view,func){
         //TODO 错误处理 resultFlag=1
+        console.log("getJson from:"+url);
         $.getJSON(url, function(data){
           console.log(data);
           func(view,data);

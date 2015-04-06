@@ -1,7 +1,7 @@
  <% _.each( collection, function( model, id ) { %>
                 <li class="ui-border-t">
                     <label class="ui-checkbox">
-                        <input type="checkbox" <% if (model.finish_time) { %>checked<% } %> class="checkboxObj"/>
+                        <input type="checkbox" <% if (model.finish_time) { %>checked<% } %> class="checkboxObj" value="<%=model.id%>"/>
                     </label>
                     <p>
                         <%=model.title%>

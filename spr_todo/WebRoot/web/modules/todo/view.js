@@ -37,7 +37,18 @@ define([
         },
         checkboxObj:function(e){
             var that = this;
-            //e.target.checked
+            var checked = e.target.checked;
+            var val = e.target.value;
+            if(checked){
+                T.postPage("finish",{todoLineId:val},that,that.n);
+                alert("'selected="+val);
+            }else{
+                T.postPage("unfinish",{todoLineId:val},that,that.n);
+                alert('unselected='+val);
+            } 
+        },
+        n:function(view,data){
+            var that = this,doc = document;
         }
         
     } );

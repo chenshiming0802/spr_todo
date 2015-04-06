@@ -6,6 +6,8 @@
 
 String sessionUserId = "1";//Session.getUserId(session)
 
+Request req = new Request(request);
+
 Dao dao = new Dao();
 try{	
 	dao.beginTrancation();
