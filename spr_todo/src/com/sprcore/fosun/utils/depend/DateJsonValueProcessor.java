@@ -17,7 +17,7 @@ public class DateJsonValueProcessor  implements JsonValueProcessor{
    
     public DateJsonValueProcessor(String format)  
     {
-        System.out.println("DateJsonValueProcessor(String format)");
+        //System.out.println("DateJsonValueProcessor(String format)");
    
         this.format = format;  
     }
@@ -26,7 +26,7 @@ public class DateJsonValueProcessor  implements JsonValueProcessor{
     public Object processArrayValue(Object value, JsonConfig jsonConfig)  
     {
          
-        System.out.println("processArrayValue");
+        //System.out.println("processArrayValue");
    
         String[] obj = {};  
         if (value instanceof Date[])  

@@ -37,6 +37,7 @@ public class Dao {
 			AppAsserts.notNull(dataSource, "dataSource is null");
 			conn = dataSource.getConnection();
 			conn.setAutoCommit(false);
+			logger.info("Open database connection");
 		} catch (Exception e) {
 			throw new AppException(e);
 		}
@@ -52,6 +53,7 @@ public class Dao {
 			if(conn!=null){
 				conn.close();
 			}
+			logger.info("Close database connection");
 		} catch (Exception e) {
 			throw new AppException(e);
 		}
@@ -160,15 +162,15 @@ public class Dao {
 
 	public String insert(String table_name,Map map) {
 		String uuid = UUID.randomUUID().toString();
+		PreparedStatement stmt = null;
 		try {
 			StringBuffer sb = new StringBuffer();
 			StringBuffer sbValues = new StringBuffer();
 			map.put("id",uuid);
 			sb.append("insert into "+table_name+" (");
 			String sep = "";
-			Connection conn = dataSource.getConnection();
 			Iterator<String> it = map.keySet().iterator();
-			List param = new ArrayList();
+			List param = new ArrayList();			
 			while(it.hasNext()){
 				String key = it.next();
 				Object val = map.get(key);
@@ -181,25 +183,34 @@ public class Dao {
 			sb.append(sbValues).append(")");
 			
 			printSql("insert",sb.toString(),param);
-			PreparedStatement stmt = conn.prepareStatement(sb.toString());
+			stmt = conn.prepareStatement(sb.toString());
 			stmt = setPreparedStatement(stmt, param);
 			stmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new AppException(e);
+		} finally{
+			try {
+				if(stmt!=null){
+					stmt.close();
+				}			
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+
 		}
 		return uuid;
 	}
 
 	public void update(String table_name,Map map, String id) {
 		String uuid = UUID.randomUUID().toString();
+		PreparedStatement stmt = null;
 		try {
 			StringBuffer sb = new StringBuffer();
 			StringBuffer sbValues = new StringBuffer();
 			map.put("id",uuid);
 			sb.append("update "+table_name+" set ");
 			String sep = "";
-			Connection conn = dataSource.getConnection();
 			Iterator<String> it = map.keySet().iterator();
 			List param = new ArrayList();
 			while(it.hasNext()){
@@ -214,11 +225,20 @@ public class Dao {
 			param.add(id);
 			
 			printSql("update",sb.toString(),param);
-			PreparedStatement stmt = conn.prepareStatement(sb.toString());
+			stmt = conn.prepareStatement(sb.toString());
 			stmt = setPreparedStatement(stmt, param);
 			stmt.executeUpdate();
 		} catch (Exception e) {
 			throw new AppException(e);
+		} finally{
+			try {
+				if(stmt!=null){
+					stmt.close();
+				}			
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+
 		}
  
 	}
