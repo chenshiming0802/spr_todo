@@ -43,4 +43,20 @@
 		<property name="checkoutTimeout" value="${cpool.checkoutTimeout}" />
 	</bean>
 
+
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation"
+			value="classpath:/ibatis/sqlMapConfig.xml" />
+		<!-- <property name="mappingLocations" value="classpath:/ibatis/*.xml" /> -->
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+	</bean>
+	<!-- 
+	<bean id="sqlMapClientDao" class="Open Declaration com.sprcore.fosun.utils.depend.SqlMapClientDao">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean> -->
 </beans>
